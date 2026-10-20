@@ -1,0 +1,195 @@
+/* ============================================================
+   智研 · 设计令牌
+   来源：docs/ui-concept/DESIGN-SPEC.md + preview.html
+   原则：紫与蓝只用于状态/操作/数据标记；渐变仅用于 Logo。
+   ============================================================ */
+
+:root {
+  /* ---------- 画布与内容面 ---------- */
+  --canvas: #f5f7fc;          /* 主画布：开始区与成果区底色 */
+  --paper: #ffffff;           /* 内容面：对话/研究内容/独立结果 */
+  --rail-bg: #f9fbff;         /* 项目栏底色：与内容面形成轻微层次 */
+
+  /* ---------- 品牌与状态 ---------- */
+  --purple: #5949b9;          /* 状态紫：项目选中、阶段定位 */
+  --purple-soft: #f0ecff;     /* 浅紫：选中底色 */
+  --purple-line: #d9d0ff;     /* 浅紫描边 */
+  --purple-brand: #7a6ad4;    /* 浅紫（品牌字「智研」用）：在白底上仍保证可读对比 */
+  --blue: #1769be;            /* 行动蓝：主操作、链接、数据 */
+  --blue-hover: #11589f;
+  --blue-soft: #e9f3ff;       /* 柔蓝：信息反馈 */
+  --blue-ink: #165b9e;        /* 柔蓝上的文字 */
+
+  /* ---------- 文字与分隔 ---------- */
+  --ink: #18243b;             /* 深墨：主文字 */
+  --ink-secondary: #526179;   /* 次级文字 */
+  --ink-tertiary: #58667e;    /* 三级文字（时间戳、脚注） */
+  --ink-placeholder: #65738a; /* 占位符，保证可读对比度 */
+  --line: #dce3f0;            /* 分隔线 */
+  --line-strong: #cdd8e8;     /* 控件描边 */
+
+  /* ---------- 语义色（必须同时配文案） ---------- */
+  --success: #247d65;
+  --warning: #a86220;
+  --warning-soft: #fdf3e8;
+  --danger: #bf475c;
+  --danger-soft: #fdeef1;
+  --success-soft: #e8f4f0;
+
+  /* ---------- 品牌渐变（仅 Logo 与少量品牌场景） ---------- */
+  --brand-grad: linear-gradient(135deg, #09264f 0%, #1557a4 55%, #168cc7 100%);
+  --brand-grad-line: linear-gradient(90deg, #60ddf2 0%, #b9f5f9 100%);
+
+  /* ---------- 字体规范 ----------
+     拉丁字母/数字统一 Times New Roman（放在最前，按字形自动回退）；
+     中文标题走思源黑体，正文/长文走楷体。 */
+  --font-latin: "Times New Roman", "Liberation Serif", Georgia, serif;
+  --font-sans: "Times New Roman", "Source Han Sans SC", "Noto Sans SC",
+               "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-kai: "Times New Roman", "KaiTi", "STKaiti", "Kaiti SC",
+              "Noto Serif SC", serif;
+  --font-mono: "JetBrains Mono", "Cascadia Mono", Consolas, "Courier New", monospace;
+
+  /* ---------- 字号 / 行高 ---------- */
+  --fs-body: 14px;      --lh-body: 1.7;    /* 中文正文 */
+  --fs-block: 16px;     --lh-block: 1.4;   /* 区块标题 */
+  --fs-title: 20px;     --lh-title: 1.35;  /* 项目标题 */
+  --fs-dense: 12px;     --lh-dense: 1.5;   /* 密集表格与辅助说明 */
+  --fs-micro: 11px;
+
+  /* ---------- 间距（4px 为单位） ---------- */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+  --sp-4: 16px; --sp-5: 20px; --sp-6: 24px; --sp-8: 32px;
+  --pad-control: 10px 12px;   /* 控件内部 8–12px */
+  --gap-group: 16px;          /* 信息组 */
+  --gap-block: 24px;          /* 区块 */
+
+  /* ---------- 控件尺寸 ---------- */
+  --h-control: 38px;          /* 按钮/输入框 36–40px */
+  --h-send: 40px;             /* 发送按钮 38–40px */
+  --r-btn: 6px;               /* 按钮/输入圆角 */
+  --r-card: 8px;              /* 内容卡片圆角 */
+  --r-chip: 5px;
+
+  /* ---------- 布局尺寸（列宽可拖拽，见 app.js 的 layout 控制器） ----------
+     --rail-w / --chat-w 是"当前生效宽度"，由 JS 按窗口空间约束后写入；
+     用户保存的偏好值另存于 localStorage 的 UI 偏好键（store.js）。 */
+  --h-topbar: 64px;
+  --rail-w: 248px;            /* 项目栏：初始 248，范围 220–340 */
+  --rail-w-min: 220px;
+  --rail-w-max: 340px;
+  --rail-w-default: 248px;
+  --chat-w: 390px;            /* 对话栏：初始 390，范围 320–560 */
+  --chat-w-min: 320px;
+  --chat-w-max: 560px;
+  --chat-w-default: 390px;
+  --results-w-min: 480px;     /* 成果栏最小宽度 */
+  --gutter: 6px;              /* 拖拽命中带；视觉仅 1px 分隔线 */
+  --results-strip: 44px;      /* 成果区收起后的竖向入口 40–44px */
+  --w-start: 820px;           /* 空态开始区最大宽度 */
+  --w-reading: 1060px;        /* 成果正文阅读宽度 ≈ 70 个汉字等效 */
+
+  /* ---------- 交互节奏 ---------- */
+  --t-fast: 160ms;            /* 按钮/悬停 150–200ms */
+
+  /* ---------- 焦点与选区 ---------- */
+  --focus-ring: 2px solid var(--blue);
+  --focus-offset: 2px;
+  --selection-bg: #dbe7ff;
+
+  --shadow-card: 0 1px 2px rgba(24, 36, 59, .04);
+  --shadow-pop: 0 8px 28px rgba(24, 36, 59, .14);
+}
+
+/* ============================================================
+   字体角色分配
+   ============================================================ */
+
+/* 标题与导航：思源黑体（拉丁走 Times New Roman） */
+.brand, .rail-head strong, .panel-title, .project strong, .rail-bottom b,
+.chat-head strong, .message h3, .result-head h1, .section-heading h2,
+.card h3, .subhead, .table th, .tabs button, .btn, .badge, .chip,
+.stage-label, .field label, .stat-label,
+.start-title, .demo-card .dc-tag, .demo-card .dc-title,
+.project-stage, .project-idx, .results-strip, .cta-note, .col-resizer {
+  font-family: var(--font-sans);
+}
+
+/* 正文与长文：楷体 */
+body, .message p, .card p, .prose, .compose textarea, .result-head p,
+.rail-bottom, .meta-row, .list-item, .hint, .start-line, .start-note,
+.msg-body p, .content-inner p {
+  font-family: var(--font-kai);
+}
+
+/* 代码与文件内容 */
+code, pre, .mono, .file-name, .code-block {
+  font-family: var(--font-mono);
+}
+
+/* 数字对齐：仅表格、金额、统计量 */
+.table td.num, .table th.num, .stat-value, .coefficient, .amount {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   基础重置
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+h1, h2, h3, h4 { margin: 0; font-weight: 600; }
+h1 { font-size: var(--fs-title); line-height: var(--lh-title); }
+h2 { font-size: var(--fs-block); line-height: var(--lh-block); }
+h3 { font-size: 13px; }
+
+p { margin: 0; }
+
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+
+/* 键盘焦点：2px 蓝色可见描边 */
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+  border-radius: 3px;
+}
+
+::selection { background: var(--selection-bg); color: var(--ink); }
+
+/* 滚动条：轻量，不抢视觉 */
+* { scrollbar-width: thin; scrollbar-color: #c8d3e6 transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb {
+  background: #c8d3e6; border-radius: 6px;
+  border: 3px solid transparent; background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: #aebbd2; background-clip: content-box; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* 无障碍：仅供屏幕阅读器 */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* 动效偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+  }
+}

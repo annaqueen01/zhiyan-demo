@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>智研 · 经管论文研究助手（纯前端 Demo）</title>
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <img class="logo" src="assets/logo.svg" alt="">
+      <span>智研</span>
+    </div>
+    <div class="top-actions">
+      <span class="demo-flag" title="本页为纯前端演示：文献、数据与结果均为虚构样例，不代表真实研究结论">演示数据</span>
+      <span class="sync-status" id="sync-status" data-state="local">本地已保存</span>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <!-- 左：项目栏 -->
+    <aside class="rail" aria-label="项目与研究资源">
+      <!-- 一级标题 1：新建项目 -->
+      <div class="rail-block rail-block-new">
+        <button class="rail-title rail-title-btn" id="btn-new-project" type="button">
+          <span class="rt-ico" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+          <span>新建项目</span>
+        </button>
+      </div>
+
+      <!-- 一级标题 2：资源库 -->
+      <div class="rail-block rail-block-res">
+        <div class="rail-title">
+          <span class="rt-ico" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M3 7.5h18V20H3z"/><path d="M2 4h20v3.5H2z"/><path d="M9.5 12h5"/></svg>
+          </span>
+          <span>资源库</span>
+        </div>
+        <button class="resource-row" id="btn-dataset" type="button">
+          <span class="ri"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><ellipse cx="12" cy="6" rx="7.5" ry="3"/><path d="M4.5 6v12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3V6"/><path d="M4.5 12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3"/></svg></span>
+          <span>数据库</span>
+          <span class="count" id="dataset-count">0</span>
+        </button>
+        <button class="resource-row" id="btn-library" type="button">
+          <span class="ri"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H19v3H6.5A2.5 2.5 0 0 1 4 20.5z"/></svg></span>
+          <span>文献库</span>
+          <span class="count" id="library-count">0</span>
+        </button>
+      </div>
+
+      <!-- 一级标题 3：研究项目 -->
+      <div class="rail-block rail-block-grow">
+        <div class="rail-title">
+          <span class="rt-ico" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h10"/></svg>
+          </span>
+          <span>研究项目</span>
+        </div>
+        <nav class="project-list" id="project-list" aria-label="项目列表"></nav>
+      </div>
+
+      <div class="rail-bottom">
+        <button class="user-row" id="btn-user" type="button" title="账号与设置">
+          <span class="user-avatar" id="user-avatar">研</span>
+          <span class="user-meta">
+            <span class="user-name" id="user-name">未登录</span>
+            <span class="user-hint" id="user-hint">点击设置</span>
+          </span>
+          <span class="user-gear" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.2M12 18.3v2.2M20.5 12h-2.2M5.7 12H3.5M18 6l-1.6 1.6M7.6 16.4L6 18M18 18l-1.6-1.6M7.6 7.6L6 6"/></svg>
+          </span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- 项目栏 ↔ 主区：6px 拖拽命中带（视觉仅 1px 分隔线） -->
+    <button class="col-resizer" id="split-rail" type="button" role="separator"
+            aria-orientation="vertical" aria-label="调整项目栏宽度"
+            aria-valuemin="220" aria-valuemax="340" aria-valuenow="248"
+            title="拖动调整项目栏宽度（双击恢复默认）"></button>
+
+    <!-- 中：研究对话（项目态三栏之一；空态时右列承载开始区） -->
+    <section class="chat" aria-label="研究对话">
+      <header class="chat-head">
+        <strong id="chat-project-path">研究对话</strong>
+        <div class="chat-head-row">
+          <span class="chat-sub" id="chat-subtitle">输入研究问题，或选择下方示例开始</span>
+          <span class="chat-workbench">研究工作台</span>
+        </div>
+      </header>
+      <div class="thread" id="thread" role="log" aria-live="polite" aria-label="对话记录"></div>
+
+      <!-- 空态主区（上）：起始标题与一句价值说明，位于输入组上方（整块居中） -->
+      <section class="empty-hero" id="empty-hero" aria-label="开始研究">
+        <div class="start-head">
+          <h1 class="start-title">智研——更加懂经管问题的科研助手</h1>
+          <p class="start-line">以你自己的文献库为知识底座，从研究想法走到一篇可投稿的论文。</p>
+        </div>
+      </section>
+
+      <!-- 输入组：一个边框内容纳 附件条 + 文本框 + 工具行（附件/语音/模型 + 发送） -->
+      <form class="compose" id="compose">
+        <label class="sr-only" for="prompt">输入研究问题或修订意见</label>
+
+        <div class="composer">
+          <!-- 已选附件：可逐个移除 -->
+          <div class="attach-strip" id="attach-strip" hidden></div>
+
+          <textarea id="prompt" placeholder="输入你的研究问题，例如：数字化转型对制造业企业创新产出的影响" autocomplete="off" rows="1"></textarea>
+
+          <div class="compose-row">
+            <div class="compose-tools">
+              <button class="tool-btn" id="btn-attach" type="button" title="上传附件" aria-label="上传附件">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11.5l-8.4 8.4a5 5 0 0 1-7.1-7.1l8.5-8.5a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.8 1.8 0 0 1-2.5-2.5l7.8-7.8"/></svg>
+              </button>
+              <button class="tool-btn" id="btn-voice" type="button" title="语音输入" aria-label="语音输入" aria-pressed="false">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"/><path d="M12 18v3"/></svg>
+              </button>
+
+              <!-- 模型选择：未配置时显示「暂未配置模型」，点开可从下拉里选，也可直接去配置 -->
+              <div class="model-picker" id="model-picker">
+                <button class="model-chip" id="btn-model" type="button" data-state="warn"
+                        aria-haspopup="true" aria-expanded="false" aria-controls="model-menu">
+                  <span class="mc-dot" aria-hidden="true"></span>
+                  <span class="mc-label" id="model-chip-label">暂未配置模型</span>
+                  <svg class="mc-caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg>
+                </button>
+                <div class="model-menu" id="model-menu" role="menu" aria-label="选择模型" hidden>
+                  <div class="mm-head">选择模型</div>
+                  <div class="mm-list" id="model-menu-list"></div>
+                  <button class="mm-config" id="btn-model-config" type="button" role="menuitem">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.2M12 18.3v2.2M20.5 12h-2.2M5.7 12H3.5M18 6l-1.6 1.6M7.6 16.4L6 18M18 18l-1.6-1.6M7.6 7.6L6 6"/></svg>
+                    去配置模型
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="compose-actions">
+              <small>Enter 发送 · Shift+Enter 换行</small>
+              <button class="btn btn-primary btn-send" type="submit" id="btn-send" disabled>发送</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 附件选择器：隐藏，由「上传附件」按钮触发 -->
+        <input type="file" id="file-input" multiple hidden
+               accept=".pdf,.txt,.md,.csv,.json,.docx">
+      </form>
+
+      <!-- 空态主区（下）：三张示例卡片，位于输入组下方 -->
+      <section class="empty-samples" id="empty-samples" aria-label="示例研究">
+        <div class="demo-cards" id="demo-cards"></div>
+      </section>
+    </section>
+
+    <!-- 对话栏 ↔ 成果栏：6px 拖拽命中带（视觉仅 1px 分隔线） -->
+    <button class="col-resizer" id="split-chat" type="button" role="separator"
+            aria-orientation="vertical" aria-label="调整对话栏宽度"
+            aria-valuemin="320" aria-valuemax="560" aria-valuenow="390"
+            title="拖动调整对话栏宽度（双击恢复默认）"></button>
+
+    <!-- 右：成果区（未开始项目时为空；项目态可收起为 44px 竖向入口） -->
+    <main class="results" aria-label="研究成果">
+      <div class="resource-view" id="resource-view" hidden></div>
+      <div id="project-view" hidden>
+        <header class="result-head">
+          <div class="result-head-top">
+            <div style="min-width:0">
+              <h1 id="project-title">未选择项目</h1>
+              <p class="result-sub" id="project-subtitle">提交研究问题后，这里会显示研究过程与成果</p>
+            </div>
+            <div class="result-head-right">
+              <div class="result-actions" id="result-actions"></div>
+              <button class="icon-btn" id="btn-collapse-results" type="button"
+                      aria-label="收起成果区" aria-expanded="true" aria-controls="project-view"
+                      title="收起成果区">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M14.5 4.5v15"/><path d="M19.8 10.4L17.4 12l2.4 1.6"/></svg>
+              </button>
+            </div>
+          </div>
+        </header>
+        <nav class="tabs" id="tabs" aria-label="研究阶段"></nav>
+        <div class="content">
+          <div class="content-inner" id="stage-content"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 成果区收起后的竖向入口（与拖拽线不共用命中区） -->
+    <button class="results-strip" id="btn-expand-results" type="button"
+            aria-label="展开成果区" aria-expanded="false" aria-controls="project-view"
+            title="展开成果区">
+      <span class="rs-icon" aria-hidden="true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M14.5 4.5v15"/><path d="M17.4 10.4L19.8 12l-2.4 1.6"/></svg>
+      </span>
+      <span class="rs-label">成果</span>
+    </button>
+  </div>
+</div>
+
+<div id="overlay-root"></div>
+
+<script src="scripts/util.js"></script>
+<script src="scripts/data.js"></script>
+<script src="scripts/library-real.js"></script>
+<script src="scripts/checklist.js"></script>
+<script src="scripts/store.js"></script>
+<script src="scripts/ui.js"></script>
+<script src="scripts/lit-search.js"></script>
+<script src="scripts/llm.js"></script>
+<script src="scripts/rq.js"></script>
+<script src="scripts/design-gen.js"></script>
+<script src="scripts/pdftext.js"></script>
+<script src="scripts/bm25.js"></script>
+<script src="scripts/corpus.js"></script>
+<script src="scripts/resource.js"></script>
+<script src="scripts/econ.js"></script>
+<script src="scripts/pipeline.js"></script>
+<script src="scripts/engine.js"></script>
+<script src="scripts/stages/definition.js"></script>
+<script src="scripts/stages/literature.js"></script>
+<script src="scripts/stages/design.js"></script>
+<script src="scripts/stages/data.js"></script>
+<script src="scripts/stages/stats.js"></script>
+<script src="scripts/stages/paper.js"></script>
+<script src="scripts/render.js"></script>
+<script src="scripts/app.js"></script>
+</body>
+</html>
